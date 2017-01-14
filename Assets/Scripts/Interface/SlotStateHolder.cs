@@ -24,6 +24,8 @@ public class SlotStateHolder : MonoBehaviour {
 	}
 
 	public void SwapSlots(SlotPosition leftPos, SlotPosition rightPos) {
-		_currentState = SlotLogics.MakeSwap(_currentState, leftPos, rightPos, true);
+		if( SlotLogics.CanSwap(_currentState, leftPos, rightPos) ) {
+			_currentState = SlotLogics.MakeSwap(_currentState, leftPos, rightPos, true);
+		}
 	}
 }

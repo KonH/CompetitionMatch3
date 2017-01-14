@@ -137,14 +137,17 @@ public static class SlotLogics {
 				var xGroup = new SlotGroup(parent.Width, parent.Height);
 				xGroup.Add(curPos, curSlot);
 				AddAllRightSlots(curPos, curSlot.Type, parent, xGroup, allPos);
-				var yGroup = new SlotGroup(parent.Width, parent.Height);
-				yGroup.Add(curPos, curSlot);
-				AddAllBottomSlots(curPos, curSlot.Type, parent, yGroup, allPos);
 				if( xGroup.Count > 1 ) {
 					groups.Add(xGroup);
 				}
-				if( yGroup.Count > 1 ) {
-					groups.Add(yGroup);
+				for( int x = 0; x < xGroup.Count; x++ ) {
+					var yGroup = new SlotGroup(parent.Width, parent.Height);
+					var pos = new SlotPosition(curPos.X + x, curPos.Y);
+					yGroup.Add(pos, curSlot);
+					AddAllBottomSlots(pos, curSlot.Type, parent, yGroup, allPos);
+					if( yGroup.Count > 1 ) {
+						groups.Add(yGroup);
+					}
 				}
 			}
 			allPos.Remove(curPos);
@@ -209,4 +212,25 @@ public static class SlotLogics {
 			return state;
 		}
 	}
+
+	static bool HasAnyCompletedGroup(SlotState state) {
+		var groups = CalculateGroups(state);
+		for( int i = 0; i < groups.Count; i++ ) {
+			var curGroup = groups[i];
+			if( IsGroupCompleted(curGroup) ) {
+				return true;
+			}
+		}
+		return false;
+	} 
+
+	public static bool CanSwap(SlotState state, SlotPosition leftPos, SlotPosition rightPos) {
+		var dx = Math.Abs(leftPos.X - rightPos.X);
+		var dy = Math.Abs(leftPos.Y - rightPos.Y);
+		if( (dx == 1 && dy == 0) || (dx == 0 && dy == 1) ) {
+			var newState = Swap(state, leftPos, rightPos, false);
+			return HasAnyCompletedGroup(newState);
+		}
+		return false;
+	} 
 }
