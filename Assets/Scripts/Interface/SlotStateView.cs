@@ -26,6 +26,12 @@ public class SlotStateView : MonoBehaviour {
 	bool _inAction = false;
 	Queue<Action> _actions = new Queue<Action>();
 
+	public bool InAction {
+		get {
+			return _inAction || _actions.Count > 0;
+		}
+	}
+
 	void Awake () {
 		Init();
 		Subscribe();

@@ -12,7 +12,7 @@ public class SlotStateController : MonoBehaviour {
 		ResetSelection();
 	}
 
-	void ResetSelection() {
+	public void ResetSelection() {
 		_firstPos = SlotPosition.Empty;
 		_secondPos = SlotPosition.Empty;
 	}
