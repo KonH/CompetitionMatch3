@@ -118,16 +118,7 @@ public static class SlotLogics {
 	}
 
 	static List<SlotGroup> CalculateGroups(SlotState state) {
-		var groups = new List<SlotGroup>();
-		for( int x = 0; x < state.Slots.Width; x++ ) {
-			for( int y = 0; y < state.Slots.Height; y++ ) {
-				var pos = new SlotPosition(x, y);
-				var slot = state.Slots[pos];
-				if( slot != null ) {
-					AddToGroup(state, pos, slot, groups);
-				}
-			}
-		}
+		var groups = CreateGroups(state.Slots);
 		var groupsLine = "Groups:";
 		for( int i = 0; i < groups.Count; i++ ) {
 			groupsLine += "\nGroup:\n" + groups[i].ToString();
@@ -136,28 +127,63 @@ public static class SlotLogics {
 		return groups;
 	}
 
-	// TODO: Rewrite
-	static void AddToGroup(SlotState state, SlotPosition pos, Slot slot, List<SlotGroup> groups) {
-		if( groups.Count > 0 ) {
-			for( int i = 0; i < groups.Count; i++ ) {
-				var curGroup = groups[i];
-				foreach( var item in curGroup ) {
-					var curPos = item.Key;
-					var curItem = item.Value;
-					if( slot.Type == curItem.Type ) {
-						var dx = Math.Abs(curPos.X - pos.X);
-						var dy = Math.Abs(curPos.Y - pos.Y);
-						if( ((dx == 0) && (dy == 1)) || ((dx == 1) && (dy == 0)) ) {
-							curGroup.Add(pos, slot);
-							return;
-						}
-					}
+	static List<SlotGroup> CreateGroups(SlotGroup parent) {
+		var groups = new List<SlotGroup>();
+		var allPos = new List<SlotPosition>(parent.Keys);
+		while( allPos.Count > 0 ) {
+			var curPos = allPos[0];
+			var curSlot = parent[curPos];
+			if( curSlot != null ) {
+				var xGroup = new SlotGroup(parent.Width, parent.Height);
+				xGroup.Add(curPos, curSlot);
+				AddAllRightSlots(curPos, curSlot.Type, parent, xGroup, allPos);
+				var yGroup = new SlotGroup(parent.Width, parent.Height);
+				yGroup.Add(curPos, curSlot);
+				AddAllBottomSlots(curPos, curSlot.Type, parent, yGroup, allPos);
+				if( xGroup.Count > 1 ) {
+					groups.Add(xGroup);
+				}
+				if( yGroup.Count > 1 ) {
+					groups.Add(yGroup);
 				}
 			}
+			allPos.Remove(curPos);
 		}
-		var group = new SlotGroup(state.Slots.Width, state.Slots.Height);
-		group.Add(pos, slot);
-		groups.Add(group);
+		return groups;
+	}
+
+	static void AddAllRightSlots(SlotPosition pos, SlotType type, SlotGroup parent, SlotGroup group, List<SlotPosition> allPos) {
+		var x = pos.X;
+		do {
+			x++;
+			var rightPos = new SlotPosition(x, pos.Y);
+			Slot rightSlot = null;
+			if( parent.TryGetValue(rightPos, out rightSlot) ) {
+				if( rightSlot.Type == type ) {
+					group.Add(rightPos, rightSlot);
+					allPos.Remove(rightPos);
+					continue;
+				}
+			}
+			break;
+		} while(true);
+	}
+
+	static void AddAllBottomSlots(SlotPosition pos, SlotType type, SlotGroup parent, SlotGroup group, List<SlotPosition> allPos) {
+		var y = pos.Y;
+		do {
+			y++;
+			var bottomPos = new SlotPosition(pos.X, y);
+			Slot bottomSlot = null;
+			if( parent.TryGetValue(bottomPos, out bottomSlot) ) {
+				if( bottomSlot.Type == type ) {
+					group.Add(bottomPos, bottomSlot);
+					allPos.Remove(bottomPos);
+					continue;
+				}
+			}
+			break;
+		} while(true);
 	}
 
 	static bool IsGroupCompleted(SlotGroup group) { 
@@ -171,7 +197,9 @@ public static class SlotLogics {
 			var curGroup = groups[i];
 			if( IsGroupCompleted(curGroup) ) {
 				foreach( var item in curGroup ) {
-					slotsToRemove.Add(item.Key);
+					if( !slotsToRemove.Contains(item.Key) ) {
+						slotsToRemove.Add(item.Key);
+					}
 				}
 			}
 		}
