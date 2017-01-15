@@ -3,6 +3,7 @@ using UnityEngine.UI;
 
 public class StartButton : MonoBehaviour {
 	public Button Button;
+	public SettingsLoader Loader;
 
 	public GameObject SettingsView;
 	public GameObject GameView;
@@ -12,6 +13,7 @@ public class StartButton : MonoBehaviour {
 	}
 
 	void OnClick() {
+		Loader.SaveSettings();
 		SettingsView.SetActive(false);
 		GameView.SetActive(true);
 	}

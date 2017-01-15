@@ -51,7 +51,6 @@ public class SlotState {
 			if( newIndex >= Players.Count ) {
 				newIndex = 0;
 			}
-			UnityEngine.Debug.Log(newIndex);
 			return Players[newIndex];
 		}
 	}
