@@ -10,7 +10,7 @@ public class SlotStateAI : MonoBehaviour {
 	public SlotStateHolder Holder;
 
 	bool CanMakeAction() {
-		return !View.InAction;
+		return Holder.CanTurn(true) && !View.InAction;
 	}
 
 	void Update() {

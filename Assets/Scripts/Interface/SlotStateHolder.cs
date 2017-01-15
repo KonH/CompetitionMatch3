@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 public class SlotStateHolder : MonoBehaviour {
 
@@ -8,7 +9,10 @@ public class SlotStateHolder : MonoBehaviour {
 	public SlotState CurrentState { 
 		get {
 			if( _currentState == null ) {
-				_currentState = new SlotState(Width, Height);
+				var players = new List<SlotPlayer>();
+				players.Add(new SlotPlayer(false));
+				players.Add(new SlotPlayer(true));
+				_currentState = new SlotState(Width, Height, players);
 			}
 			return _currentState;
 		} 
@@ -27,5 +31,12 @@ public class SlotStateHolder : MonoBehaviour {
 		if( SlotLogics.CanSwap(_currentState, leftPos, rightPos) ) {
 			_currentState = SlotLogics.MakeSwap(_currentState, leftPos, rightPos, true);
 		}
+	}
+
+	public bool CanTurn(bool ai) {
+		if ( CurrentState.Status == TurnType.PlayerTurn ) {
+			return ai == CurrentState.CurrentPlayer.AI;
+		}
+		return false;
 	}
 }

@@ -76,7 +76,11 @@ public static class SlotLogics {
 		newState = UpdateGroups(newState, fire);
 		if( IsUnstableState(newState) ) {
 			return UpdateState(newState, fire);
+		} else if ( IsBlockedState(newState) ) {
+			newState = ResolveState(newState, fire);
+			return UpdateState(newState, fire);
 		} else {
+			newState = UpdateStatus(newState, fire);
 			return newState;
 		}
 	}
@@ -224,6 +228,15 @@ public static class SlotLogics {
 		return false;
 	} 
 
+	static SlotState UpdateStatus(SlotState state, bool fire) {
+		var newState = state;
+		if( state.Status == TurnType.Break ) {
+			newState = state.ChangeStatus(TurnType.PlayerTurn);
+		}
+		newState = newState.NextPlayer();
+		return newState;
+	}
+
 	public static bool CanSwap(SlotState state, SlotPosition leftPos, SlotPosition rightPos) {
 		var dx = Math.Abs(leftPos.X - rightPos.X);
 		var dy = Math.Abs(leftPos.Y - rightPos.Y);
@@ -232,5 +245,25 @@ public static class SlotLogics {
 			return HasAnyCompletedGroup(newState);
 		}
 		return false;
-	} 
+	}
+
+	static bool IsBlockedState(SlotState state) {
+		foreach( var leftKey in state.Slots.Keys ) {
+			foreach( var rightKey in state.Slots.Keys ) {
+				if( CanSwap(state, leftKey, rightKey) ) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+	static SlotState ResolveState(SlotState state, bool fire) {
+		var newState = state.ChangeStatus(TurnType.Break);
+		while( HasAnyCompletedGroup(newState) || IsBlockedState(newState) ) {
+			var allPos = new List<SlotPosition>(newState.Slots.Keys);
+			newState = Remove(newState, allPos, fire);
+			newState = FillSlots(newState, fire);
+		}
+		return newState;
+	}
 }
