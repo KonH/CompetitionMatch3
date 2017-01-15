@@ -6,12 +6,17 @@ public class SlotStateHolder : MonoBehaviour {
 	public int Width = 0;
 	public int Height = 0;
 
+	public bool AI1;
+	public bool AI2;
+
+	public int HP;
+
 	public SlotState CurrentState { 
 		get {
 			if( _currentState == null ) {
 				var players = new List<SlotPlayer>();
-				players.Add(new SlotPlayer(false, 10, 10));
-				players.Add(new SlotPlayer(true, 10, 10));
+				players.Add(new SlotPlayer(AI1, HP, HP));
+				players.Add(new SlotPlayer(AI2, HP, HP));
 				_currentState = new SlotState(Width, Height, players);
 			}
 			return _currentState;

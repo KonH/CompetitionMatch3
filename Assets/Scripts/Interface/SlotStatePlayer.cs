@@ -7,6 +7,6 @@ public class SlotStatePlayer : MonoBehaviour {
 	public SlotStateHolder Holder;
 
 	void Update() {
-		EventSystem.enabled = Holder.CanTurn(false);
+		EventSystem.enabled = Holder.CanTurn(false) || (Holder.CurrentState.Status == TurnType.End);
 	}
 }

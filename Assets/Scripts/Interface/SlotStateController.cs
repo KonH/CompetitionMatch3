@@ -18,6 +18,9 @@ public class SlotStateController : MonoBehaviour {
 	}
 
 	public void OnClick(SlotPosition newPos) {
+		if( Holder.CurrentState.Status != TurnType.PlayerTurn ) {
+			return;
+		}
 		if( _firstPos == SlotPosition.Empty ) {
 			_firstPos = newPos;
 		} else {
