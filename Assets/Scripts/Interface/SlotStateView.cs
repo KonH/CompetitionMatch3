@@ -135,7 +135,7 @@ public class SlotStateView : MonoBehaviour {
 	}
 
 	void OnRemove(SlotView view) {
-		view.RectTransform.DOScale(Vector3.zero, 0.1f).OnComplete(
+		view.RectTransform.DOScale(Vector3.zero, 0.05f).OnComplete(
 			() => {
 				Destroy(view.gameObject);
 				OnActionComplete();
@@ -161,7 +161,7 @@ public class SlotStateView : MonoBehaviour {
 		if( view ) {
 			var nextPos = GetItemPosition(pos);
 			view.UpdatePosition(pos);
-			seq.Insert(0, view.RectTransform.DOLocalMove(nextPos, 0.2f));
+			seq.Insert(0, view.RectTransform.DOLocalMove(nextPos, 0.05f));
 		}
 		_slots[pos] = view;
 	}
