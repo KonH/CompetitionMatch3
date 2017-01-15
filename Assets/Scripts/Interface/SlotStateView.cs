@@ -125,7 +125,7 @@ public class SlotStateView : MonoBehaviour {
 
 	void OnCreate(SlotView view) {
 		view.RectTransform.localScale = Vector3.zero;
-		view.RectTransform.DOScale(Vector3.one, 0.1f).OnComplete(OnActionComplete);
+		view.RectTransform.DOScale(Vector3.one, 0.05f).OnComplete(OnActionComplete);
 	}
 
 	void RemoveItem(SlotPosition pos) {
@@ -135,7 +135,7 @@ public class SlotStateView : MonoBehaviour {
 	}
 
 	void OnRemove(SlotView view) {
-		view.RectTransform.DOScale(Vector3.zero, 0.2f).OnComplete(
+		view.RectTransform.DOScale(Vector3.zero, 0.1f).OnComplete(
 			() => {
 				Destroy(view.gameObject);
 				OnActionComplete();

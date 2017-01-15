@@ -56,8 +56,14 @@ public class SlotState {
 		}
 	}
 
+	public SlotState DecreasePlayerHP(int index, int damage) {
+		var clone = Clone();
+		clone.Players[index] = clone.Players[index].DecreaseHP(damage);
+		return clone;
+	}
+
 	public override string ToString() {
-		var str = string.Format("Status: {0}\n", Status);
+		var str = string.Format("Status: {0}, Player 1: {1}, Player 2: {2}\n", Status, Players[0].HP, Players[1].HP);
 		str += "Slots:\n";
 		str += Slots.ToString();
 		return str;

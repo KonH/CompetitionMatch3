@@ -10,8 +10,8 @@ public class SlotStateHolder : MonoBehaviour {
 		get {
 			if( _currentState == null ) {
 				var players = new List<SlotPlayer>();
-				players.Add(new SlotPlayer(false));
-				players.Add(new SlotPlayer(true));
+				players.Add(new SlotPlayer(false, 10, 10));
+				players.Add(new SlotPlayer(true, 10, 10));
 				_currentState = new SlotState(Width, Height, players);
 			}
 			return _currentState;

@@ -123,11 +123,6 @@ public static class SlotLogics {
 
 	static List<SlotGroup> CalculateGroups(SlotState state) {
 		var groups = CreateGroups(state.Slots);
-		var groupsLine = "Groups:";
-		for( int i = 0; i < groups.Count; i++ ) {
-			groupsLine += "\nGroup:\n" + groups[i].ToString();
-		}
-		UnityEngine.Debug.Log(groupsLine);
 		return groups;
 	}
 
@@ -200,9 +195,11 @@ public static class SlotLogics {
 	static SlotState UpdateGroups(SlotState state, bool fire) {
 		var groups = CalculateGroups(state);
 		var slotsToRemove = new List<SlotPosition>();
+		var damage = 0;
 		for( int i = 0; i < groups.Count; i++ ) {
 			var curGroup = groups[i];
 			if( IsGroupCompleted(curGroup) ) {
+				damage += curGroup.Count;
 				foreach( var item in curGroup ) {
 					if( !slotsToRemove.Contains(item.Key) ) {
 						slotsToRemove.Add(item.Key);
@@ -211,10 +208,23 @@ public static class SlotLogics {
 			}
 		}
 		if( slotsToRemove.Count > 0 ) {
-			return Remove(state, slotsToRemove, fire);
+			var newState = Remove(state, slotsToRemove, fire);
+			return DecreaseEnemyHP(newState, damage);
 		} else {
 			return state;
 		}
+	}
+
+	static SlotState DecreaseEnemyHP(SlotState state, int damage) {
+		if( state.CurrentPlayer != null ) {
+			var enemyIndex = state.Players.IndexOf(state.CurrentPlayer);
+			enemyIndex++;
+			if( enemyIndex >= state.Players.Count ) {
+				enemyIndex = 0;
+			} 
+			return state.DecreasePlayerHP(enemyIndex, damage);
+		}
+		return state;
 	}
 
 	static bool HasAnyCompletedGroup(SlotState state) {
@@ -230,11 +240,24 @@ public static class SlotLogics {
 
 	static SlotState UpdateStatus(SlotState state, bool fire) {
 		var newState = state;
-		if( state.Status == TurnType.Break ) {
-			newState = state.ChangeStatus(TurnType.PlayerTurn);
+		if( !IsGameEnded(state) ) {
+			if( state.Status == TurnType.Break ) {
+				newState = state.ChangeStatus(TurnType.PlayerTurn);
+			}
+			newState = newState.NextPlayer();
+		} else {
+			newState = state.ChangeStatus(TurnType.End);
 		}
-		newState = newState.NextPlayer();
 		return newState;
+	}
+
+	static bool IsGameEnded(SlotState state) {
+		for( int i = 0; i < state.Players.Count; i++ ) {
+			if( state.Players[i].HP <= 0 ) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public static bool CanSwap(SlotState state, SlotPosition leftPos, SlotPosition rightPos) {
