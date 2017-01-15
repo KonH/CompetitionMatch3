@@ -27,7 +27,7 @@ public static class SlotLogics {
 				newState = SlotLogics.Apply(newState, action, fire);
 			}
 		} while(action != null);
-		return UpdateState(newState, fire);
+		return UpdateState(newState, fire, false);
 	}
 
 	static SlotState FillSlot(SlotState state, SlotPosition pos, bool fire) {
@@ -59,7 +59,7 @@ public static class SlotLogics {
 
 	public static SlotState MakeSwap(SlotState state, SlotPosition leftPos, SlotPosition rightPos, bool fire = false) {
 		var newState = Swap(state, leftPos, rightPos, fire);
-		return UpdateState(newState, fire);
+		return UpdateState(newState, fire, true);
 	}
 
 	static SlotState Swap(SlotState state, SlotPosition leftPos, SlotPosition rightPos, bool fire) {
@@ -67,18 +67,18 @@ public static class SlotLogics {
 		return Apply(state, action, fire);
 	}
 
-	static SlotState UpdateState(SlotState state, bool fire) {
+	static SlotState UpdateState(SlotState state, bool fire, bool withDamage) {
 		var newState = state;
 		while( IsUnstableState(newState) ) {
 			newState = UpdateGravity(newState, fire);
 			newState = UpdateGeneration(newState, fire);
 		}
-		newState = UpdateGroups(newState, fire);
+		newState = UpdateGroups(newState, fire, withDamage);
 		if( IsUnstableState(newState) ) {
-			return UpdateState(newState, fire);
+			return UpdateState(newState, fire, false);
 		} else if ( IsBlockedState(newState) ) {
 			newState = ResolveState(newState, fire);
-			return UpdateState(newState, fire);
+			return UpdateState(newState, fire, false);
 		} else {
 			newState = UpdateStatus(newState, fire);
 			return newState;
@@ -197,7 +197,7 @@ public static class SlotLogics {
 		return 5 * (1 + bonus);
 	}
 
-	static SlotState UpdateGroups(SlotState state, bool fire) {
+	static SlotState UpdateGroups(SlotState state, bool fire, bool withDamage) {
 		var groups = CalculateGroups(state);
 		var slotsToRemove = new List<SlotPosition>();
 		var damage = 0;
@@ -214,7 +214,7 @@ public static class SlotLogics {
 		}
 		if( slotsToRemove.Count > 0 ) {
 			var newState = Remove(state, slotsToRemove, fire);
-			return DecreaseEnemyHP(newState, damage);
+			return withDamage ? DecreaseEnemyHP(newState, damage) : newState;
 		} else {
 			return state;
 		}
