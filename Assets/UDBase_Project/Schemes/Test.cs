@@ -12,7 +12,9 @@ public class ProjectScheme : Scheme {
 		AddController(new Events(), new EventController());
 		AddController(new Scene(), new DirectSceneLoader());
 		
-		var save = new FsJsonDataSave().AddNode<GameSettings>("settings");
+		var save = new FsJsonDataSave().
+			AddNode<GameSettings>("settings").
+			AddNode<GameStats>("stats");
 		AddController(new Save(), save);
 	}
 }
