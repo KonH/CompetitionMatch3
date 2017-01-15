@@ -192,6 +192,11 @@ public static class SlotLogics {
 		return group.Count >= 3;
 	}
 
+	static int CalculateDamage(int len) {
+		var bonus = len - 3;
+		return 5 * (1 + bonus);
+	}
+
 	static SlotState UpdateGroups(SlotState state, bool fire) {
 		var groups = CalculateGroups(state);
 		var slotsToRemove = new List<SlotPosition>();
@@ -199,7 +204,7 @@ public static class SlotLogics {
 		for( int i = 0; i < groups.Count; i++ ) {
 			var curGroup = groups[i];
 			if( IsGroupCompleted(curGroup) ) {
-				damage += curGroup.Count;
+				damage += CalculateDamage(curGroup.Count);
 				foreach( var item in curGroup ) {
 					if( !slotsToRemove.Contains(item.Key) ) {
 						slotsToRemove.Add(item.Key);
